@@ -38,4 +38,5 @@ To run the bot use:
 * [Telegram Docs](https://core.telegram.org/bots)
 * [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
 * [wikipedia python packege](https://github.com/goldsmith/Wikipedia)
+* User [West.andrew.g](https://en.wikipedia.org/wiki/User:West.andrew.g) work on popular articles.
 
