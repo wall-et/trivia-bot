@@ -35,9 +35,9 @@ def start(bot, update):
     logger.info(f"> Start chat #{chat_id}")
 
     game.add_user(chat_id)
-    value = game.get_value(chat_id)
+    page_title = game.get_page_title(chat_id)
 
-    bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge. have you heard of {value.title}?")
+    bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge. have you heard of {page_title}?")
 
 
 def respond(bot, update):
@@ -65,8 +65,8 @@ def button(bot, update):
     logger.info(f"= Got on chat #{chat_id}: pressed new game button")
 
     game.add_user(chat_id)
-    value = game.get_value(chat_id)
-    bot.send_message(chat_id=chat_id, text=f"have you heard of {value.title}")
+    page_title = game.get_page_title(chat_id)
+    bot.send_message(chat_id=chat_id, text=f"have you heard of {page_title}")
 
 
 
