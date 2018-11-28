@@ -14,7 +14,12 @@ import settings
 
 class GameLogic:
     def __init__(self):
-        self.player_score = 0
+        #self.player_score = 0
+        #init database
+        pass
+
+
+
     def string_found(self,string1, string2):
         if re.search(r"\b" + re.escape(string1) + r"\b", string2):
             return True
@@ -35,7 +40,7 @@ class GameLogic:
             word = input(f"guess a word on {value.title}\n")
 
             if self.string_found(word, value.content):
-                if word in played_guesses:
+                if word in played_guesses or word.title():
                     print("Nice try. can't fool me. you used this word already")
                     continue
                 played_guesses.append(word)
@@ -54,4 +59,4 @@ class GameLogic:
                 break
 
 
-GameLogic.one_round()
+#game.one_round()
