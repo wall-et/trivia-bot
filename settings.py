@@ -1,5 +1,5 @@
 NUM_WRONG_GUESSES = 3
-NUM_GOOD_GUESSES = 5
+NUM_GOOD_GUESSES = 3
 POINTS_PER_GOOD_GUESS = 1
 POINTS_PER_WRONG_GUESS = -1
 
@@ -11,3 +11,5 @@ DB = "WikiTrivi_DB"
 PAGE_COL="pages"
 WORD_COL="common_words"
 USER_COL="users"
+FAILER_GIFS_COL="fail_gifs"
+WINNER_GIFS_COL="win_gifs"

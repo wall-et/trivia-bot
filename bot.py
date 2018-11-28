@@ -12,8 +12,6 @@ from telegram.ext import Updater
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ChatAction
 
-id_dict={}
-
 logging.basicConfig(
     format='[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s',
     level=logging.INFO)
@@ -46,14 +44,17 @@ def respond(bot, update):
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     res = game.test_word(text, chat_id)
 
-    if 'You win' in res or 'You failed' in res:
+    if 'You win' in res:
         keyboard = [[InlineKeyboardButton("new game",callback_data='1')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
+        send_gif(bot, res[res.index('url') + 3 :], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
 
-        send_gif(bot, 'https://media.giphy.com/media/xMIlfwRRQNEcw/giphy.gif', chat_id)
-
-        bot.send_message(chat_id=chat_id, text=res,reply_markup=reply_markup)
-
+    elif 'You failed' in res:
+        keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        send_gif(bot, res[res.index('url') + 3 :], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
 
     else:
         bot.send_message(chat_id=chat_id, text=res)
