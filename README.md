@@ -37,9 +37,14 @@ To run the bot use:
 ## Credits and References
 * [Telegram Docs](https://core.telegram.org/bots)
 * [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
-* [wikipedia python packege](https://github.com/goldsmith/Wikipedia)
+* [wikipedia - parse wiki pages python library](https://github.com/goldsmith/Wikipedia)
+* [pandas - data analysis python library](https://github.com/pandas-dev/pandas)
 * User [West.andrew.g](https://en.wikipedia.org/wiki/User:West.andrew.g) work on popular articles.
 
 
-* https://stackoverflow.com/questions/44203397/python-requests-get-returns-improperly-decoded-text-instead-of-utf-8
 
+thank you internet
+* https://stackoverflow.com/questions/44203397/python-requests-get-returns-improperly-decoded-text-instead-of-utf-8
+* [introduction to scraping tables](https://qxf2.com/blog/web-scraping-using-python/)
+* [multiple tables in data](https://www.reddit.com/r/learnpython/comments/6tbrsz/pandas_dataframe_to_csv_attribute_error/)
+* [rename the headers](https://chrisalbon.com/python/data_wrangling/pandas_rename_column_headers/)
