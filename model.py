@@ -7,41 +7,44 @@ from pymongo.mongo_client import MongoClient
 import pandas
 
 
-
 # f"https://en.wikipedia.org/w/api.php?action=query&titles={pageid}&prop=revisions&rvprop=content&rvsection=0&format=json")
 # blobtext = requests.get(f"https://en.wikipedia.org/wiki/Wikipedia:Multiyear_ranking_of_most_viewed_pages")
 # print(blobtext.text)
 # var titleRegex = new RegExp("<a href=\"/browse/post/\\d*/\">([^(]*) \\(");
 # matchObj = re.search("birth_date\s*=\s*{{.*?\|([0-9]*?\|[0-9]*?\|[0-9]*).*?}}", r.text, flags=0)
 
-
-class Storage:
-    def __init__(self, host, db, col):
-        self.client = MongoClient(host)
-        self.db = self.client.get_database(db)
-        self.lists = self.db.get_collection(col)
-
-    def add_item(self, word):
-        self.lists.replace_one({"word": word}, {"word": word}, upsert=True)
-
-    def get_item(self, word):
-        return self.lists.find_one({"word": word})
-
-
 class WordDB:
     def __init__(self):
-        self.storage = Storage(settings.HOST, settings.DB, settings.WORD_COL)
+        self.client = MongoClient(settings.HOST)
+        self.db = self.client.get_database(settings.DB)
+        self.lists = self.db.get_collection(settings.WORD_COL)
 
     def add_to_DB(self):
         with open("common_words.txt", "r") as f:
             for word in f:
-                # splitted = line.split()
-                # if len(splitted) > 0:
-                #     for word in splitted:
-                self.storage.add_item(word.split()[0])
+                self.lists.replace_one({"word": word.split()[0].lower()}, {"word": word.split()[0].lower()},
+                                       upsert=True)
 
-    def get_word(self,word):
-        return self.storage.get_item(word)
+    def get_word(self, word):
+        return self.lists.find_one({"word": word})
+
+
+class UserDB:
+    def __init__(self):
+        self.client = MongoClient(settings.HOST)
+        self.db = self.client.get_database(settings.DB)
+        self.lists = self.db.get_collection(settings.USER_COL)
+
+    def add_to_DB(self,id):
+        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": 0}, upsert=True)
+
+    def get_score(self, id):
+        user=self.lists.find_one({"user_id": id})
+        score=user['score']
+        return score
+
+    def update_score(self,id,score):
+        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": score}, upsert=True)
 
 
 class GameLogic:
@@ -67,16 +70,20 @@ class GameLogic:
         print("current title " + value.title)
 
         while current_wrong_guesses < settings.NUM_WRONG_GUESSES:
-            word = input(f"guess a word on {value.title}\n")
+            word = input(f"guess a word on {value.title}\n").lower()
+
+            if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
+                print("Are you kidding? you can't guess numbers or letters....")
+                continue
 
             if self.string_found(word, value.content.lower()):
                 if word in played_guesses:
                     print("Nice try. can't fool me. you used this word already")
                     continue
 
-                if self.w_db.get_word(word):
-                    print("C'mon,This word is way to common......")
-                    continue
+                # if self.w_db.get_word(word) or word.isdecimal() or set(word).issubset(numbers) or set(word).issubset(letters):
+                #     print("C'mon,This word is way to common......")
+                #     continue
 
                 played_guesses.append(word)
                 print("Way to go!")
@@ -94,7 +101,5 @@ class GameLogic:
                 break
 
 
-game=GameLogic()
+game = GameLogic()
 game.one_round()
-
-
