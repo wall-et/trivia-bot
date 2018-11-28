@@ -126,6 +126,16 @@ class GameLogic:
             else:
                 return "invalid answer.... answer 'yes' or 'no'."
 
+        if self.users_info_dict[id]['state'] == "failed":
+            if word == "yes":
+                self.users_info_dict[id]['state'] = "getting value"
+                return wp.summary(self.users_info_dict[id]['page_title'],sentences=3)
+            elif word == "no":
+                self.users_info_dict[id]['state']="getting value"
+                return
+            else:
+                return "invalid answer.... answer 'yes' or 'no'."
+
 
         if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
             return "Are you kidding? you can't guess numbers or letters...."
@@ -157,5 +167,6 @@ class GameLogic:
             self.users_info_dict[id]["score"] += settings.POINTS_PER_WRONG_GUESS
             if self.users_info_dict[id]['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}"
+                self.users_info_dict[id]['state'] = "failed"
+                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}\n would you like to here about this subject?"
             return f"Nope! You're wrong. tries left: {settings.NUM_WRONG_GUESSES -self.users_info_dict[id]['wrong_guesses']}"
