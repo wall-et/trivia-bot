@@ -90,19 +90,21 @@ class GameLogic:
             return "Are you kidding? you can't guess numbers or letters...."
 
         if self.string_found(word, value.content.lower()):
-            if word in self.users_info_dict[id]["played_guesses"]:
-                return "Nice try. can't fool me. you used this word already"
+            split=word.split()
+            for w in split:
+                if w in self.users_info_dict[id]["played_guesses"] :
+                    return "Nice try. can't fool me. you used this word already"
 
             if self.w_db.get_word(word):
                 return "C'mon,This word is way to common......"
 
-            self.users_info_dict[id]["played_guesses"].append(word)
+            [self.users_info_dict[id]["played_guesses"].append(w) for w in split]
             self.users_info_dict[id]["good_guesses"] += 1
             self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                return f"You win!!!!!\nYour score is\n Your score is {self.user_db.get_score(id)}"
-            return "Way to go!"
+                return f"You win!!!!!\nYour score is {self.user_db.get_score(id)}"
+            return f"Way to go! you'l win in {settings.NUM_GOOD_GUESSES -self.users_info_dict[id]['good_guesses']} guesses"
 
         else:
             self.users_info_dict[id]["wrong_guesses"] += 1
@@ -110,5 +112,5 @@ class GameLogic:
             if self.users_info_dict[id]['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
                 return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}"
-            return "Nope! You're wrong."
+            return f"Nope! You're wrong. tries left: {settings.NUM_WRONG_GUESSES -self.users_info_dict[id]['wrong_guesses']}"
 
