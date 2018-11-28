@@ -21,7 +21,6 @@ class PagesDB:
         with open("minimal_data.csv", "r", encoding='utf-8') as f:
             reader = csv.reader(f, delimiter=",")
             for i, line in enumerate(reader):
-                # print('line[{}] = {}'.format(i, line))
                 self.lists.replace_one({"title": line[0].lower()}, {"title": line[0].lower()}, upsert=True)
 
     def get_page(self, word):
@@ -66,6 +65,33 @@ class UsersDB:
     def update_score(self, id, score):
         self.lists.replace_one({"user_id": id}, {"user_id": id, "score": self.get_score(id) + score}, upsert=True)
 
+class fail_gifDB:
+    def __init__(self):
+        self.client = MongoClient(settings.HOST)
+        self.db = self.client.get_database(settings.DB)
+        self.lists = self.db.get_collection(settings.FAILER_GIFS_COL)
+
+    def add_all_to_DB(self):
+        with open("fail_gifs.txt", "r") as f:
+            for url in f.readlines():
+                self.lists.replace_one({"url": url }, {"url": url},
+                                       upsert=True)
+    def get_random_gif(self):
+        return self.lists.find().limit(-1).skip(random.randint(0,12)).next()['url']
+
+class win_gifDB:
+    def __init__(self):
+        self.client = MongoClient(settings.HOST)
+        self.db = self.client.get_database(settings.DB)
+        self.lists = self.db.get_collection(settings.WINNER_GIFS_COL)
+
+    def add_all_to_DB(self):
+        with open("win_gifs.txt", "r") as f:
+            for url in f.readlines():
+                self.lists.replace_one({"url": url }, {"url": url},
+                                       upsert=True)
+    def get_random_gif(self):
+        return self.lists.find().limit(-1).skip(random.randint(0,10)).next()['url']
 
 class GameLogic:
     def setup_dbs(self):
@@ -74,22 +100,24 @@ class GameLogic:
             self.p_db.add_all_to_DB()
         if not settings.WORD_COL in dbnames:
             self.w_db.add_all_to_DB()
+        if not settings.WINNER_GIFS_COL in dbnames:
+            self.wg_db.add_all_to_DB()
+        if not settings.FAILER_GIFS_COL in dbnames:
+            self.g_db.add_all_to_DB()
 
     def __init__(self):
         self.w_db = WordsDB()
-        # self.w_db.add_all_to_DB()
         self.p_db = PagesDB()
-        # self.p_db.add_all_to_DB()
         self.user_db = UsersDB()
+        self.g_db = fail_gifDB()
+        self.wg_db = win_gifDB()
         self.setup_dbs()
         self.users_info_dict = defaultdict()
 
 
+
     def add_user(self, id):
         self.user_db.add_to_DB(id)
-        # self.users_state_dict[id] = "getting value"
-        # self.users_info_dict[id] = {"good_guesses": 0, "wrong_guesses": 0, "score": 0, "played_guesses": []}
-
         self.users_info_dict[id] = defaultdict()
         self.users_info_dict[id]['state'] = "getting value"
         self.users_info_dict[id]['good_guesses'] = 0
@@ -105,6 +133,7 @@ class GameLogic:
     def get_page_title(self,id):
         self.users_info_dict[id]['page_title'] = self.p_db.get_random_page()
         return self.users_info_dict[id]['page_title']
+
 
     def string_found(self, string1, string2):
         if re.search(r"\b" + re.escape(string1) + r"\b", string2):
@@ -163,7 +192,7 @@ class GameLogic:
 
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                return f"You win!!!!!\nYour score is {self.user_db.get_score(id)}"
+                return f"You win!!!!!\nYour score is {self.user_db.get_score(id)}url{self.wg_db.get_random_gif()}"
             return f"Way to go! you'l win in {settings.NUM_GOOD_GUESSES -self.users_info_dict[id]['good_guesses']} guesses"
 
         else:
@@ -171,8 +200,7 @@ class GameLogic:
             self.users_info_dict[id]["score"] += settings.POINTS_PER_WRONG_GUESS
             if self.users_info_dict[id]['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                self.users_info_dict[id]['state'] = "failed"
-                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}\n would you like to here about this subject?"
+                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}would you like to here about this subject?url{self.g_db.get_random_gif()}"
             return f"Nope! You're wrong. tries left: {settings.NUM_WRONG_GUESSES -self.users_info_dict[id]['wrong_guesses']}"
 
 # game = GameLogic()

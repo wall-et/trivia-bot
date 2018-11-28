@@ -12,8 +12,11 @@ from telegram.ext import Updater
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ChatAction
 
+<<<<<<< HEAD
+=======
 id_dict = {}
 
+>>>>>>> 6d7a75a9d20fc2e46b202be4135b2596723970a0
 logging.basicConfig(
     format='[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s',
     level=logging.INFO)
@@ -48,16 +51,19 @@ def respond(bot, update):
     text = update.message.text
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     res = game.test_word(text, chat_id)
+
     if 'You win' in res:
+        keyboard = [[InlineKeyboardButton("new game",callback_data='1')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        send_gif(bot, res[res.index('url') + 3 :], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
+
+    elif 'You failed' in res:
         keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        send_gif(bot, 'https://media.giphy.com/media/xMIlfwRRQNEcw/giphy.gif', chat_id)
-        bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
-    elif 'You failed' in res:
-        keyboard = [[InlineKeyboardButton("yes", callback_data='2'), InlineKeyboardButton("no", callback_data='3')]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        send_gif(bot, 'https://media.giphy.com/media/xMIlfwRRQNEcw/giphy.gif', chat_id)
-        bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
+        send_gif(bot, res[res.index('url') + 3 :], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
+
     else:
         bot.send_message(chat_id=chat_id, text=res)
 

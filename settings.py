@@ -9,6 +9,9 @@ NUMBERS = set("1234567890")
 
 HOST = None
 DB = "WikiTrivi_DB"
-PAGE_COL = "pages"
-WORD_COL = "common_words"
-USER_COL = "users"
+
+PAGE_COL="pages"
+WORD_COL="common_words"
+USER_COL="users"
+FAILER_GIFS_COL="fail_gifs"
+WINNER_GIFS_COL="win_gifs"
