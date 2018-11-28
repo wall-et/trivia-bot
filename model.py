@@ -8,22 +8,33 @@ import wikipedia
 # print(blobtext.text)
 # var titleRegex = new RegExp("<a href=\"/browse/post/\\d*/\">([^(]*) \\(");
 # matchObj = re.search("birth_date\s*=\s*{{.*?\|([0-9]*?\|[0-9]*?\|[0-9]*).*?}}", r.text, flags=0)
+NUM_WRONG_GUESSES = 3
+NUM_GOOD_GUESSES = 5
+
+
 def get_guessing_value():
     return "Donald Trump"
 
 
 def simple_game():
-    value =wikipedia.page(get_guessing_value())
+    current_good_guesses = 0
+    current_wrong_guesses = 0
+    value = wikipedia.page(get_guessing_value())
     print("title " + value.title)
-    while True:
-        word = input(f"word on {value.title}")
+    while current_wrong_guesses < NUM_WRONG_GUESSES:
+        word = input(f"word on {value.title}:")
         if word in value.content:
             print("Way to go!")
+            current_good_guesses += 1
         else:
             print("Your wrong.....")
-        if word == exit:
+            current_wrong_guesses += 1
+        if current_good_guesses==NUM_GOOD_GUESSES:
+            print("You win!!!!!")
             break
+
+
     # pprint.pprint(value.links)
 
-simple_game()
 
+simple_game()
