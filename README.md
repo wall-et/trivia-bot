@@ -1,9 +1,9 @@
-# {YOUR BOT NAME HERE}
-{ONE LINE BOT DESCRIPTION HERE} <https://t.me/{BOT_ID}>
+# WikiTrivi
+play an infinite trivia game testing your general knowledge <https://t.me/{BOT_ID}>
 
-* {Participant 1 Name}
-* {Participant 2 Name}
-* {Participant 3 Name}
+* Chani Glick
+* Noami Pindrus
+* Efrat Traube
 
 {OPTIONAL: MORE PROJECT INFO}
 
@@ -37,5 +37,5 @@ To run the bot use:
 ## Credits and References
 * [Telegram Docs](https://core.telegram.org/bots)
 * [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
-* {ADD MORE REFERENCES HERE}
+* [wikipedia python packege](https://github.com/goldsmith/Wikipedia)
 

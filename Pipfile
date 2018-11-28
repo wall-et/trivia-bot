@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+mid-hack-5-telegram-bot = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.7"
