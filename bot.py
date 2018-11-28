@@ -12,11 +12,7 @@ from telegram.ext import Updater
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ChatAction
 
-<<<<<<< HEAD
-=======
-id_dict = {}
 
->>>>>>> 6d7a75a9d20fc2e46b202be4135b2596723970a0
 logging.basicConfig(
     format='[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s',
     level=logging.INFO)
