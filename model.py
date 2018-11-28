@@ -69,7 +69,7 @@ class UsersDB:
 
 class GameLogic:
     def setup_dbs(self):
-        dbnames=MongoClient(settings.HOST)[settings.DB].collection_names()
+        dbnames=MongoClient(settings.HOST)[settings.DB].list_collection_names()
         if not settings.PAGE_COL in dbnames:
             self.p_db.add_all_to_DB()
         if not settings.WORD_COL in dbnames:
@@ -174,3 +174,5 @@ class GameLogic:
                 self.users_info_dict[id]['state'] = "failed"
                 return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}\n would you like to here about this subject?"
             return f"Nope! You're wrong. tries left: {settings.NUM_WRONG_GUESSES -self.users_info_dict[id]['wrong_guesses']}"
+
+# game = GameLogic()
