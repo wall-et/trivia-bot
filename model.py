@@ -16,11 +16,11 @@ def simple_game():
     value =wikipedia.page(get_guessing_value())
     print("title " + value.title)
     while True:
-        word = input(f"word on {value.title}")
+        word = input(f"guess a word on {value.title}\n")
         if word in value.content:
             print("Way to go!")
         else:
-            print("Your wrong.....")
+            print("Nope! You're wrong.")
         if word == exit:
             break
     # pprint.pprint(value.links)
