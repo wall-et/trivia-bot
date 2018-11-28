@@ -13,10 +13,6 @@ import wikipedia
 
 ny = wikipedia.page("Donald Trump")
 print("title" + ny.title)
-# u'New York'
-# ny.url
-# u'http://en.wikipedia.org/wiki/New_York'
-# pprint.pprint("content------------ " + ny.content)
 while False:
     word = input("word on donald")
     if word in ny.content:
@@ -25,9 +21,5 @@ while False:
         print("NOPE")
     if word == exit:
         break
-# u'New York is a state in the Northeastern region of the United States. New York is the 27th-most exten'...
 pprint.pprint(ny.links)
-# u'1790 United States Census'
 
-# >>> wikipedia.set_lang("fr")
-# >>> wikipedia.summary("Facebook", sentences=1)
