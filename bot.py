@@ -40,10 +40,11 @@ def respond(bot, update):
     text = update.message.text
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     res = game.test_word(text, chat_id)
-    if res == 'win' or res == 'lose':
-        keyboard = [[InlineKeyboardButton("new game")]]
+
+    if 'You win' in res or 'You failed' in res:
+        keyboard = [[InlineKeyboardButton("new game",callback_data='1')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(res,reply_markup=reply_markup)
+        bot.send_message(chat_id=chat_id, text=res,reply_markup=reply_markup)
     else:
         bot.send_message(chat_id=chat_id, text=res)
 
@@ -55,7 +56,6 @@ def button(bot, update):
 
     game.add_user(chat_id)
     value = game.get_value(chat_id)
-    
     bot.send_message(chat_id=chat_id, text=f"have you heard of {value.title}")
 
 
