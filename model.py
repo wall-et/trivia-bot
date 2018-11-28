@@ -10,33 +10,38 @@ import wikipedia
 # matchObj = re.search("birth_date\s*=\s*{{.*?\|([0-9]*?\|[0-9]*?\|[0-9]*).*?}}", r.text, flags=0)
 NUM_WRONG_GUESSES = 3
 NUM_GOOD_GUESSES = 5
+POINTS_PER_GOOD_GUESS = 1
+POINTS_PER_WRONG_GUESS = -1
 
 
 def get_guessing_value():
     return "Donald Trump"
 
 
-def simple_game():
+def one_round():
     current_good_guesses = 0
     current_wrong_guesses = 0
+    player_score = 0
     value = wikipedia.page(get_guessing_value())
-    print("title " + value.title)
+    print("current title " + value.title)
 
     while current_wrong_guesses < NUM_WRONG_GUESSES:
         word = input(f"guess a word on {value.title}\n")
 
-        if word in value.content:
+        if f"{word}" in value.content:
             print("Way to go!")
             current_good_guesses += 1
+            player_score += POINTS_PER_GOOD_GUESS
         else:
             print("Nope! You're wrong.")
             current_wrong_guesses += 1
+            player_score += POINTS_PER_WRONG_GUESS
         if current_good_guesses == NUM_GOOD_GUESSES:
-            print("You win!!!!!")
+            print(f"You win!!!!!\nYour score is {player_score}")
             break
         if current_wrong_guesses == NUM_WRONG_GUESSES:
-            print("Nah, You failed this round.")
+            print(f"Nah, You failed this round.\nYour score is {player_score}")
             break
 
 
-simple_game()
+one_round()
