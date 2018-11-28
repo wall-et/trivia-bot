@@ -28,6 +28,7 @@ def one_round():
     current_good_guesses = 0
     current_wrong_guesses = 0
     player_score = 0
+    played_guesses = []
     value = wikipedia.page(get_guessing_value())
     print("current title " + value.title)
 
@@ -35,6 +36,10 @@ def one_round():
         word = input(f"guess a word on {value.title}\n")
 
         if string_found(word, value.content):
+            if word in played_guesses:
+                print("Nice try. can't fool me. you used this word already")
+                continue
+            played_guesses.append(word)
             print("Way to go!")
             current_good_guesses += 1
             player_score += POINTS_PER_GOOD_GUESS
