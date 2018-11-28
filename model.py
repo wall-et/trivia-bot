@@ -78,7 +78,7 @@ class GameLogic:
         if self.users_state_dict[id]=="getting value":
             if word == "yes":
                 self.users_state_dict[id] = "playing"
-                return "Ok. Try and guess 5 main words about him!"
+                return "Ok. Try and guess 5 main words about it!"
             elif word == "no":
                 value=self.get_value(id)
                 return f"So you heard about {value.title}?"
@@ -88,6 +88,9 @@ class GameLogic:
         value=self.users_info_dict[id]['value']
         if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
             return "Are you kidding? you can't guess numbers or letters...."
+
+        if word in self.get_value(id).title.lower():
+            return "hey, enter words about it...."
 
         if self.string_found(word, value.content.lower()):
             split=word.split()
