@@ -35,70 +35,80 @@ class UserDB:
         self.db = self.client.get_database(settings.DB)
         self.lists = self.db.get_collection(settings.USER_COL)
 
-    def add_to_DB(self,id):
-        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": 0}, upsert=True)
+    def add_to_DB(self, id):
+        if not self.lists.find_one({"user_id": id}):
+            self.lists.insert_one({"user_id": id, "score": 0})
 
     def get_score(self, id):
-        user=self.lists.find_one({"user_id": id})
-        score=user['score']
+        user = self.lists.find_one({"user_id": id})
+        score = user['score']
         return score
 
-    def update_score(self,id,score):
-        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": score}, upsert=True)
+    def update_score(self, id, score):
+        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": self.get_score()+score}, upsert=True)
 
 
 class GameLogic:
     def __init__(self):
-        self.player_score = 0
         self.w_db = WordDB()
         self.w_db.add_to_DB()
+        self.user_db = UserDB()
+        self.users_state_dict = {}
+        self.users_info_dict = {}
+
+    def add_user(self, id):
+        self.user_db.add_to_DB(id)
+        self.users_state_dict[id]="getting value"
+        self.users_info_dict[id] = {"good_guesses": 0, "wrong_guesses": 0, "score": 0, "played_guesses": []}
+
+    def get_value(self,id):
+        value = wp.page("Donald Trump")
+        self.users_info_dict['id']['value']=value
+        return value
 
     def string_found(self, string1, string2):
         if re.search(r"\b" + re.escape(string1) + r"\b", string2):
             return True
         return False
 
-    def get_guessing_value(self, ):
-        return "Donald Trump"
 
-    def one_round(self):
-        current_good_guesses = 0
-        current_wrong_guesses = 0
+    def test_word(self, word, id):
+        word=word.lower()
 
-        played_guesses = []
-        value = wp.page(self.get_guessing_value())
-        print("current title " + value.title)
-
-        while current_wrong_guesses < settings.NUM_WRONG_GUESSES:
-            word = input(f"guess a word on {value.title}\n").lower()
-
-            if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
-                print("Are you kidding? you can't guess numbers or letters....")
-                continue
-
-            if self.string_found(word, value.content.lower()):
-                if word in played_guesses:
-                    print("Nice try. can't fool me. you used this word already")
-                    continue
-
-                # if self.w_db.get_word(word) or word.isdecimal() or set(word).issubset(numbers) or set(word).issubset(letters):
-                #     print("C'mon,This word is way to common......")
-                #     continue
-
-                played_guesses.append(word)
-                print("Way to go!")
-                current_good_guesses += 1
-                self.player_score += settings.POINTS_PER_GOOD_GUESS
+        if self.users_state_dict[id]=="getting value":
+            if word == "yes":
+                self.users_state_dict[id] = "playing"
+                return "Ok. Try and guess 5 main words about him!"
+            elif word == "no":
+                value=self.get_value()
+                return f"So you heard about{value.title}?"
             else:
-                print("Nope! You're wrong.")
-                current_wrong_guesses += 1
-                self.player_score += settings.POINTS_PER_WRONG_GUESS
-            if current_good_guesses == settings.NUM_GOOD_GUESSES:
-                print(f"You win!!!!!\nYour score is {self.player_score}")
-                break
-            if current_wrong_guesses == settings.NUM_WRONG_GUESSES:
-                print(f"Nah, You failed this round.\nYour score is {self.player_score}")
-                break
+                return "invalid answer.... answer 'yes' or 'no'."
 
+        value=self.users_info_dict[id]['value']
+        if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
+            return "Are you kidding? you can't guess numbers or letters...."
 
+        if self.string_found(word, value.content.lower()):
+            if word in self.users_info_dict[id]["played_guesses"]:
+                return "Nice try. can't fool me. you used this word already"
+
+            if self.w_db.get_word(word):
+                return "C'mon,This word is way to common......"
+
+            self.users_info_dict[id]["played_guesses"].append(word)
+            self.users_info_dict[id]["good_guesses"] += 1
+            self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
+            if self.users_info_dict['id']['good_guesses'] == settings.NUM_GOOD_GUESSES:
+                self.user_db.update_score(id, self.users_info_dict['id']['score'])
+                return f"You win!!!!!\nYour score is\n Your score is {self.users_info_dict['id']['score']}"
+            return "Way to go!"
+
+        else:
+            self.users_info_dict[id]["wrong_guesses"] += 1
+            self.users_info_dict[id]["score"] += settings.POINTS_PER_WRONG_GUESS
+            if self.users_info_dict['id']['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
+                self.user_db.update_score(id, self.users_info_dict['id']['score'])
+                return f"Nah, You failed this round.\n Your score is {self.users_info_dict['id']['score']}"
+            return "Nope! You're wrong."
 
