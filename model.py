@@ -101,5 +101,4 @@ class GameLogic:
                 break
 
 
-game = GameLogic()
-game.one_round()
+
