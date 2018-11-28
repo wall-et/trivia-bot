@@ -55,7 +55,15 @@ table_dataframe_minimal14 = table_dataframe14[['Article', 'views']]
 with open('minimal_data.csv', 'a', encoding='utf-8') as f:
     table_dataframe_minimal14.to_csv(f, header=None, index=False)
 
-# with open("minimal_data.csv", "r", encoding='utf-8') as f:
-#     reader = csv.reader(f, delimiter=",")
-#     for i, line in enumerate(reader):
-#         print('line[{}] = {}'.format(i, line))
+
+html13 = requests.get(f"https://en.wikipedia.org/wiki/User:West.andrew.g/2013_popular_pages")
+df13 = pd.read_html(html13.content)
+# print(df13[1])
+table_dataframe13 = df13[1][1:]
+column_names13 = ["Rank", "Article", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "views",]
+table_dataframe13.columns = column_names13
+table_dataframe_minimal13 = table_dataframe13[['Article', 'views']]
+# print(table_dataframe_minimal16)
+
+with open('minimal_data.csv', 'a', encoding='utf-8') as f:
+    table_dataframe_minimal13.to_csv(f, header=None, index=False)
