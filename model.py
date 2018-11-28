@@ -1,11 +1,11 @@
-# YOUR BOT LOGIC/STORAGE/BACKEND FUNCTIONS HERE
 import pprint
 import requests
-import wikipedia
+import wikipedia as wp
 import re
 import settings
 from pymongo.mongo_client import MongoClient
 import pandas
+
 
 
 # f"https://en.wikipedia.org/w/api.php?action=query&titles={pageid}&prop=revisions&rvprop=content&rvsection=0&format=json")
@@ -63,7 +63,7 @@ class GameLogic:
         current_wrong_guesses = 0
 
         played_guesses = []
-        value = wikipedia.page(self.get_guessing_value())
+        value = wp.page(self.get_guessing_value())
         print("current title " + value.title)
 
         while current_wrong_guesses < settings.NUM_WRONG_GUESSES:
@@ -96,4 +96,5 @@ class GameLogic:
 
 game=GameLogic()
 game.one_round()
+
 
