@@ -4,15 +4,13 @@ import requests
 import wikipedia
 import re
 
+
 # f"https://en.wikipedia.org/w/api.php?action=query&titles={pageid}&prop=revisions&rvprop=content&rvsection=0&format=json")
 # blobtext = requests.get(f"https://en.wikipedia.org/wiki/Wikipedia:Multiyear_ranking_of_most_viewed_pages")
 # print(blobtext.text)
 # var titleRegex = new RegExp("<a href=\"/browse/post/\\d*/\">([^(]*) \\(");
 # matchObj = re.search("birth_date\s*=\s*{{.*?\|([0-9]*?\|[0-9]*?\|[0-9]*).*?}}", r.text, flags=0)
-NUM_WRONG_GUESSES = 3
-NUM_GOOD_GUESSES = 5
-POINTS_PER_GOOD_GUESS = 1
-POINTS_PER_WRONG_GUESS = -1
+
 
 
 def string_found(string1, string2):
