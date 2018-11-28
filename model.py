@@ -112,13 +112,13 @@ class GameLogic:
         return False
 
     def test_word(self, word, id):
-        word = word.lower()
 
+        word = word.lower()
         if self.users_info_dict[id]['state'] == "getting value":
             if word == "yes":
                 self.users_info_dict[id]['state'] = "playing"
                 self.get_full_page(id)
-                return "Ok. Try and guess 5 main words about it!"
+                return f"Ok. Try and guess {settings.NUM_GOOD_GUESSES} main words about it!"
 
             elif word == "no":
                 self.get_page_title(id)
@@ -129,7 +129,7 @@ class GameLogic:
         if self.users_info_dict[id]['state'] == "failed":
             if word == "yes":
                 self.users_info_dict[id]['state'] = "getting value"
-                return wp.summary(self.users_info_dict[id]['page_title'],sentences=3)
+                return wp.summary(self.users_info_dict[id]['page_title'],sentences=3)+'\n'+self.users_info_dict[id]['page_content'].url
             elif word == "no":
                 self.users_info_dict[id]['state']="getting value"
                 return
@@ -140,23 +140,27 @@ class GameLogic:
         if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
             return "Are you kidding? you can't guess numbers or letters...."
 
-
         if word in self.users_info_dict[id]['page_title'].lower():
             return "hey, enter words about it...."
 
+        split = word.split()
+        for w in split:
+            if w in self.users_info_dict[id]["played_guesses"]:
+                return "Nice try. can't fool me. you used this word already"
+
+        if self.w_db.get_word(word):
+            return "C'mon,This word is way too common......"
+
         if self.string_found(word, self.users_info_dict[id]['page_content'].content.lower()):
-            split = word.split()
-
-            for w in split:
-                if w in self.users_info_dict[id]["played_guesses"]:
-                    return "Nice try. can't fool me. you used this word already"
-
-            if self.w_db.get_word(word):
-                return "C'mon,This word is way too common......"
 
             [self.users_info_dict[id]["played_guesses"].append(w) for w in split]
-            self.users_info_dict[id]["good_guesses"] += 1
+        
+            if word in self.users_info_dict[id]['page_content'].links:
+                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS*2
+            else:
+                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS
             self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
+
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
                 return f"You win!!!!!\nYour score is {self.user_db.get_score(id)}"

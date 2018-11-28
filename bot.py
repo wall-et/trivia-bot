@@ -39,7 +39,7 @@ def start(bot, update):
     page_title = game.get_page_title(chat_id)
     keyboard = [[InlineKeyboardButton("yes", callback_data='2'), InlineKeyboardButton("no", callback_data='3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge. have you heard of {page_title}?",
+    bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge.\n have you heard of {page_title}?",
                      reply_markup=reply_markup)
 
 
@@ -76,7 +76,7 @@ def button(bot, update):
     elif query.data == '2':
         logger.info(f"= Got on chat #{chat_id}: pressed yes button")
         res = game.test_word("yes", chat_id)
-        if res == "Ok. Try and guess 5 main words about it!":
+        if "Ok. Try and guess" in res:
             bot.send_message(chat_id=chat_id, text=res)
         else:
             keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
