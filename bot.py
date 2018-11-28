@@ -25,24 +25,40 @@ dispatcher = updater.dispatcher
 
 game = model.GameLogic()
 
-
-
 def start(bot, update):
     chat_id = update.message.chat_id
     logger.info(f"> Start chat #{chat_id}")
-    value = game.get_guessing_value()
+
+    game.add_user(chat_id)
+    value = game.get_value(chat_id)
+
     bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge. have you heard of {value.title}")
+
 
 def respond(bot, update):
     chat_id = update.message.chat_id
     text = update.message.text
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
-    if text == 'no' or text == 'nope':
-        value = wikipedia.page("Donald Trump")
-        update.message.reply_text(f'ok. how about {value.title}')
-    elif text == 'yes':
-        update.message.reply_text('ok. try and guess five words from his wiki page')
-    elif string_found(text, value.content)
+    res = game.test_word(text, chat_id)
+
+    if 'You win' in res or 'You failed' in res:
+        keyboard = [[InlineKeyboardButton("new game",callback_data='1')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        bot.send_message(chat_id=chat_id, text=res,reply_markup=reply_markup)
+    else:
+        bot.send_message(chat_id=chat_id, text=res)
+
+
+def button(bot, update):
+    query = update.callback_query
+    chat_id = query.message.chat_id
+    logger.info(f"= Got on chat #{chat_id}: pressed new game button")
+
+    game.add_user(chat_id)
+    value = game.get_value(chat_id)
+    bot.send_message(chat_id=chat_id, text=f"have you heard of {value.title}")
+
+
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
