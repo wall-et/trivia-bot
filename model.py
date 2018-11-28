@@ -5,21 +5,32 @@ import re
 import settings
 from pymongo.mongo_client import MongoClient
 import pandas
+import csv
+
+class PagesDB:
+    def __init__(self):
+        self.client = MongoClient(settings.HOST)
+        self.db = self.client.get_database(settings.DB)
+        self.lists = self.db.get_collection(settings.PAGE_COL)
+
+    def add_all_to_DB(self):
+        with open("minimal_data.csv", "r", encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter=",")
+            for i, line in enumerate(reader):
+                # print('line[{}] = {}'.format(i, line))
+                self.lists.replace_one({"title": line[0].lower()}, {"title": line[0].lower()},upsert=True)
+
+    def get_page(self, word):
+        return self.lists.find_one({"title": word})
 
 
-# f"https://en.wikipedia.org/w/api.php?action=query&titles={pageid}&prop=revisions&rvprop=content&rvsection=0&format=json")
-# blobtext = requests.get(f"https://en.wikipedia.org/wiki/Wikipedia:Multiyear_ranking_of_most_viewed_pages")
-# print(blobtext.text)
-# var titleRegex = new RegExp("<a href=\"/browse/post/\\d*/\">([^(]*) \\(");
-# matchObj = re.search("birth_date\s*=\s*{{.*?\|([0-9]*?\|[0-9]*?\|[0-9]*).*?}}", r.text, flags=0)
-
-class WordDB:
+class WordsDB:
     def __init__(self):
         self.client = MongoClient(settings.HOST)
         self.db = self.client.get_database(settings.DB)
         self.lists = self.db.get_collection(settings.WORD_COL)
 
-    def add_to_DB(self):
+    def add_all_to_DB(self):
         with open("common_words.txt", "r") as f:
             for word in f:
                 self.lists.replace_one({"word": word.split()[0].lower()}, {"word": word.split()[0].lower()},
@@ -29,7 +40,7 @@ class WordDB:
         return self.lists.find_one({"word": word})
 
 
-class UserDB:
+class UsersDB:
     def __init__(self):
         self.client = MongoClient(settings.HOST)
         self.db = self.client.get_database(settings.DB)
@@ -50,9 +61,11 @@ class UserDB:
 
 class GameLogic:
     def __init__(self):
-        self.w_db = WordDB()
-        self.w_db.add_to_DB()
-        self.user_db = UserDB()
+        self.w_db = WordsDB()
+        self.w_db.add_all_to_DB()
+        self.p_db = PagesDB()
+        self.p_db.add_all_to_DB()
+        self.user_db = UsersDB()
         self.users_state_dict = {}
         self.users_info_dict = {}
 
