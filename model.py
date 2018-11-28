@@ -45,7 +45,7 @@ class UserDB:
         return score
 
     def update_score(self, id, score):
-        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": self.get_score()+score}, upsert=True)
+        self.lists.replace_one({"user_id": id}, {"user_id": id, "score": self.get_score(id)+score}, upsert=True)
 
 
 class GameLogic:
@@ -63,7 +63,7 @@ class GameLogic:
 
     def get_value(self,id):
         value = wp.page("Donald Trump")
-        self.users_info_dict['id']['value']=value
+        self.users_info_dict[id]['value']=value
         return value
 
     def string_found(self, string1, string2):
@@ -80,8 +80,8 @@ class GameLogic:
                 self.users_state_dict[id] = "playing"
                 return "Ok. Try and guess 5 main words about him!"
             elif word == "no":
-                value=self.get_value()
-                return f"So you heard about{value.title}?"
+                value=self.get_value(id)
+                return f"So you heard about {value.title}?"
             else:
                 return "invalid answer.... answer 'yes' or 'no'."
 
@@ -99,16 +99,16 @@ class GameLogic:
             self.users_info_dict[id]["played_guesses"].append(word)
             self.users_info_dict[id]["good_guesses"] += 1
             self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
-            if self.users_info_dict['id']['good_guesses'] == settings.NUM_GOOD_GUESSES:
-                self.user_db.update_score(id, self.users_info_dict['id']['score'])
-                return f"You win!!!!!\nYour score is\n Your score is {self.users_info_dict['id']['score']}"
+            if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
+                self.user_db.update_score(id, self.users_info_dict[id]['score'])
+                return f"You win!!!!!\nYour score is\n Your score is {self.user_db.get_score(id)}"
             return "Way to go!"
 
         else:
             self.users_info_dict[id]["wrong_guesses"] += 1
             self.users_info_dict[id]["score"] += settings.POINTS_PER_WRONG_GUESS
-            if self.users_info_dict['id']['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
-                self.user_db.update_score(id, self.users_info_dict['id']['score'])
-                return f"Nah, You failed this round.\n Your score is {self.users_info_dict['id']['score']}"
+            if self.users_info_dict[id]['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
+                self.user_db.update_score(id, self.users_info_dict[id]['score'])
+                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}"
             return "Nope! You're wrong."
 
