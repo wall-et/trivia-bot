@@ -95,7 +95,8 @@ class win_gifDB:
                                        upsert=True)
 
     def get_random_gif(self):
-        return self.lists.find().limit(-1).skip(random.randint(0, 10)).next()['url']
+        count = self.lists.estimated_document_count()
+        return self.lists.find()[random.randrange(count)]['url']
 
 
 class GameLogic:
@@ -154,12 +155,14 @@ class GameLogic:
         # return list[random.randrange(len(list))]
         return random.choice(list)
 
-    def get_more_info(self,id):
-        return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + self.users_info_dict[id]['page_content'].url
+    def get_more_info(self, id):
+        return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + self.users_info_dict[id][
+            'page_content'].url
 
     def test_word(self, word, id):
         word = word.lower()
         if self.users_info_dict[id]['state'] == "getting value":
+
             if word == "yes":
                 self.users_info_dict[id]['state'] = "playing"
                 self.get_full_page(id)
@@ -176,13 +179,13 @@ class GameLogic:
         if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
             return self.get_random_list_value(settings.NUMBERS_RESPONSES)
 
-        if word in self.users_info_dict[id]['page_title'].lower():
-            return self.get_random_list_value(settings.TITLE_REPONSES)
-
         split = word.split()
         for w in split:
             if w in self.users_info_dict[id]["played_guesses"]:
                 return self.get_random_list_value(settings.REPEATING_GUESS)
+            for k in self.users_info_dict[id]['page_title'].lower():
+                if w == k:
+                    return self.get_random_list_value(settings.TITLE_REPONSES)
 
         if self.w_db.get_word(word):
             return self.get_random_list_value(settings.COMMON_RESPONSES)
@@ -194,10 +197,10 @@ class GameLogic:
             [self.users_info_dict[id]["played_guesses"].append(w) for w in split]
 
             if self.test_premium(word, self.users_info_dict[id]['page_content'].links):
-                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS * 2
+                self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS*2
             else:
-                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS
-            self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
+                self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
+            self.users_info_dict[id]["good_guesses"] += 1
 
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
@@ -216,8 +219,6 @@ class GameLogic:
                 score1 = self.user_db.get_score(id)
                 link1 = self.g_db.get_random_gif()
                 return self.get_random_list_value(settings.LOSE_RESPONSES).format(score1, link1)
-            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['wrong_guesses']
-            print(score1)
+            score1 = settings.NUM_WRONG_GUESSES - self.users_info_dict[id]['wrong_guesses']
             return self.get_random_list_value(settings.FAIL_RESPONSES).format(score1)
 
-# game = GameLogic()
