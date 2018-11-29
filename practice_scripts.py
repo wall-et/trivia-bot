@@ -1,10 +1,6 @@
-import csv
-import pprint
 
-from bs4 import BeautifulSoup
 import pandas as pd
 import requests
-import wikipedia as wp
 
 # Get the html source
 html17 = requests.get(f"https://en.wikipedia.org/wiki/User:West.andrew.g/2017_Popular_pages")
