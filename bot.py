@@ -1,9 +1,6 @@
 import secret_settings
 import logging
 
-import wikipedia
-import requests
-
 import model
 
 from telegram.ext import CommandHandler, CallbackQueryHandler
@@ -11,7 +8,6 @@ from telegram.ext import MessageHandler, Filters
 from telegram.ext import Updater
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ChatAction
-
 
 logging.basicConfig(
     format='[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s',
@@ -36,9 +32,10 @@ def start(bot, update):
 
     game.add_user(chat_id)
     page_title = game.get_page_title(chat_id)
-    keyboard = [[InlineKeyboardButton("yes", callback_data='2'), InlineKeyboardButton("no", callback_data='3')]]
+    keyboard = [[InlineKeyboardButton("Yes", callback_data='2'), InlineKeyboardButton("No", callback_data='3')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.send_message(chat_id=chat_id, text=f"welcome! let’s check your knowledge.\n have you heard of {page_title}?",
+    bot.send_message(chat_id=chat_id,
+                     text=f"Welcome To The Wiki Trivia!\nWe're going to test your knowledge.\nHave you heard of {page_title.title()}?",
                      reply_markup=reply_markup)
 
 
@@ -48,17 +45,18 @@ def respond(bot, update):
     logger.info(f"= Got on chat #{chat_id}: {text!r}")
     res = game.test_word(text, chat_id)
 
-    if 'You win' in res:
-        keyboard = [[InlineKeyboardButton("new game",callback_data='1')]]
+    if 'win' in res:
+        keyboard = [[InlineKeyboardButton("New Game", callback_data='1')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        send_gif(bot, res[res.index('url') + 3 :], chat_id)
-        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
+        send_gif(bot, res[res.index('url') + 3:], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')], reply_markup=reply_markup)
 
     elif 'You failed' in res:
-        keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
+        keyboard = [
+            [InlineKeyboardButton("New Game", callback_data='1'), InlineKeyboardButton("Read More", callback_data='4')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        send_gif(bot, res[res.index('url') + 3 :], chat_id)
-        bot.send_message(chat_id=chat_id, text=res[:res.index('url')],reply_markup=reply_markup)
+        send_gif(bot, res[res.index('url') + 3:], chat_id)
+        bot.send_message(chat_id=chat_id, text=res[:res.index('url')], reply_markup=reply_markup)
 
     else:
         bot.send_message(chat_id=chat_id, text=res)
@@ -71,29 +69,30 @@ def button(bot, update):
         logger.info(f"= Got on chat #{chat_id}: pressed new game button")
         game.add_user(chat_id)
         page_title = game.get_page_title(chat_id)
-        keyboard = [[InlineKeyboardButton("yes", callback_data='2'), InlineKeyboardButton("no", callback_data='3')]]
+        keyboard = [[InlineKeyboardButton("Yes", callback_data='2'), InlineKeyboardButton("No", callback_data='3')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        bot.send_message(chat_id=chat_id, text=f"have you heard of {page_title}",reply_markup=reply_markup)
+        bot.send_message(chat_id=chat_id, text=f"have you heard of {page_title}", reply_markup=reply_markup)
+
 
     elif query.data == '2':
         logger.info(f"= Got on chat #{chat_id}: pressed yes button")
         res = game.test_word("yes", chat_id)
-        if "Ok. Try and guess" in res:
+        if "Try and guess" in res:
             bot.send_message(chat_id=chat_id, text=res)
         else:
-            keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
+            keyboard = [[InlineKeyboardButton("New Game", callback_data='1')]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
 
     elif query.data == '3':
         logger.info(f"= Got on chat #{chat_id}: pressed no button")
         res = game.test_word("no", chat_id)
-        if res==None:
-            keyboard = [[InlineKeyboardButton("new game", callback_data='1')]]
+        if res == None:
+            keyboard = [[InlineKeyboardButton("New Game", callback_data='1')]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             bot.send_message(chat_id=chat_id, text="play again?", reply_markup=reply_markup)
         else:
-            keyboard = [[InlineKeyboardButton("yes", callback_data='2'), InlineKeyboardButton("no", callback_data='3')]]
+            keyboard = [[InlineKeyboardButton("Yes", callback_data='2'), InlineKeyboardButton("No", callback_data='3')]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
 

@@ -1,12 +1,8 @@
-import pprint
 import random
-
-import requests
 import wikipedia as wp
 import re
 import settings
 from pymongo.mongo_client import MongoClient
-import pandas
 import csv
 from collections import defaultdict
 
@@ -21,6 +17,8 @@ class PagesDB:
         with open("minimal_data.csv", "r", encoding='utf-8') as f:
             reader = csv.reader(f, delimiter=",")
             for i, line in enumerate(reader):
+                if re.search(r"\b" + re.escape(line[0].lower()) + r"\b", settings.WIKI_EXLUDE_VALS):
+                    continue
                 self.lists.replace_one({"title": line[0].lower()}, {"title": line[0].lower()}, upsert=True)
 
     def get_page(self, word):
@@ -65,6 +63,7 @@ class UsersDB:
     def update_score(self, id, score):
         self.lists.replace_one({"user_id": id}, {"user_id": id, "score": self.get_score(id) + score}, upsert=True)
 
+
 class fail_gifDB:
     def __init__(self):
         self.client = MongoClient(settings.HOST)
@@ -74,10 +73,12 @@ class fail_gifDB:
     def add_all_to_DB(self):
         with open("fail_gifs.txt", "r") as f:
             for url in f.readlines():
-                self.lists.replace_one({"url": url }, {"url": url},
+                self.lists.replace_one({"url": url}, {"url": url},
                                        upsert=True)
+
     def get_random_gif(self):
-        return self.lists.find().limit(-1).skip(random.randint(0,12)).next()['url']
+        return self.lists.find().limit(-1).skip(random.randint(0, 12)).next()['url']
+
 
 class win_gifDB:
     def __init__(self):
@@ -88,14 +89,16 @@ class win_gifDB:
     def add_all_to_DB(self):
         with open("win_gifs.txt", "r") as f:
             for url in f.readlines():
-                self.lists.replace_one({"url": url }, {"url": url},
+                self.lists.replace_one({"url": url}, {"url": url},
                                        upsert=True)
+
     def get_random_gif(self):
-        return self.lists.find().limit(-1).skip(random.randint(0,10)).next()['url']
+        return self.lists.find().limit(-1).skip(random.randint(0, 10)).next()['url']
+
 
 class GameLogic:
     def setup_dbs(self):
-        dbnames=MongoClient(settings.HOST)[settings.DB].list_collection_names()
+        dbnames = MongoClient(settings.HOST)[settings.DB].list_collection_names()
         if not settings.PAGE_COL in dbnames:
             self.p_db.add_all_to_DB()
         if not settings.WORD_COL in dbnames:
@@ -114,8 +117,6 @@ class GameLogic:
         self.setup_dbs()
         self.users_info_dict = defaultdict()
 
-
-
     def add_user(self, id):
         self.user_db.add_to_DB(id)
         self.users_info_dict[id] = defaultdict()
@@ -125,20 +126,22 @@ class GameLogic:
         self.users_info_dict[id]['score'] = 0
         self.users_info_dict[id]['played_guesses'] = []
 
-
     def get_full_page(self, id):
         value = wp.page(self.users_info_dict[id]['page_title'])
         self.users_info_dict[id]['page_content'] = value
 
-    def get_page_title(self,id):
+    def get_page_title(self, id):
         self.users_info_dict[id]['page_title'] = self.p_db.get_random_page()
         return self.users_info_dict[id]['page_title']
-
 
     def string_found(self, string1, string2):
         if re.search(r"\b" + re.escape(string1) + r"\b", string2):
             return True
         return False
+
+    def get_random_list_value(self, list):
+        # return list[random.randrange(len(list))]
+        return random.choice(list)
 
     def test_word(self, word, id):
 
@@ -147,60 +150,69 @@ class GameLogic:
             if word == "yes":
                 self.users_info_dict[id]['state'] = "playing"
                 self.get_full_page(id)
-                return f"Ok. Try and guess {settings.NUM_GOOD_GUESSES} main words about it!"
+                return f"Ok. We've collected some Data about it.\nTry and guess {settings.NUM_GOOD_GUESSES} important words about this value!\nGive me your first guess"
 
             elif word == "no":
                 self.get_page_title(id)
-                return f"So have you heard about {self.users_info_dict[id]['page_title']}?"
+                page_title = self.users_info_dict[id]['page_title']
+                return self.get_random_list_value(settings.CHOOSE_VALUE).format(page_title)
+                # return f"So have you heard about {self.users_info_dict[id]['page_title']}?"
             else:
-                return "invalid answer.... answer 'yes' or 'no'."
+                return self.get_random_list_value(settings.INVALID_ANSWERS)
 
         if self.users_info_dict[id]['state'] == "failed":
             if word == "yes":
                 self.users_info_dict[id]['state'] = "getting value"
-                return wp.summary(self.users_info_dict[id]['page_title'],sentences=3)+'\n'+self.users_info_dict[id]['page_content'].url
+                return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + \
+                       self.users_info_dict[id]['page_content'].url
             elif word == "no":
-                self.users_info_dict[id]['state']="getting value"
+                self.users_info_dict[id]['state'] = "getting value"
                 return
             else:
-                return "invalid answer.... answer 'yes' or 'no'."
-
+                return self.get_random_list_value(settings.INVALID_ANSWERS)
 
         if word in settings.LETTERS or set(word).issubset(settings.NUMBERS):
-            return "Are you kidding? you can't guess numbers or letters...."
+            return self.get_random_list_value(settings.NUMBERS_RESPONSES)
 
         if word in self.users_info_dict[id]['page_title'].lower():
-            return "hey, enter words about it...."
+            return self.get_random_list_value(settings.TITLE_REPONSES)
 
         split = word.split()
         for w in split:
             if w in self.users_info_dict[id]["played_guesses"]:
-                return "Nice try. can't fool me. you used this word already"
+                return self.get_random_list_value(settings.REPEATING_GUESS)
 
         if self.w_db.get_word(word):
-            return "C'mon,This word is way too common......"
+            return self.get_random_list_value(settings.COMMON_RESPONSES)
 
         if self.string_found(word, self.users_info_dict[id]['page_content'].content.lower()):
 
             [self.users_info_dict[id]["played_guesses"].append(w) for w in split]
-        
+
             if word in self.users_info_dict[id]['page_content'].links:
-                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS*2
+                self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS * 2
             else:
                 self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS
             self.users_info_dict[id]["score"] += settings.POINTS_PER_GOOD_GUESS
 
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                return f"You win!!!!!\nYour score is {self.user_db.get_score(id)}url{self.wg_db.get_random_gif()}"
-            return f"Way to go! you'l win in {settings.NUM_GOOD_GUESSES -self.users_info_dict[id]['good_guesses']} guesses"
+                score1 = self.user_db.get_score(id)
+                link1 = self.wg_db.get_random_gif()
+                return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1, link1)
+            # return f"Way to go! you'l finish in {settings.NUM_GOOD_GUESSES -self.users_info_dict[id]['good_guesses']} guesses"
+            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
+            return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
 
         else:
             self.users_info_dict[id]["wrong_guesses"] += 1
             self.users_info_dict[id]["score"] += settings.POINTS_PER_WRONG_GUESS
             if self.users_info_dict[id]['wrong_guesses'] == settings.NUM_WRONG_GUESSES:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
-                return f"Nah, You failed this round.\n Your score is {self.user_db.get_score(id)}would you like to here about this subject?url{self.g_db.get_random_gif()}"
-            return f"Nope! You're wrong. tries left: {settings.NUM_WRONG_GUESSES -self.users_info_dict[id]['wrong_guesses']}"
+                score1 = self.user_db.get_score(id)
+                link1 = self.g_db.get_random_gif()
+                return self.get_random_list_value(settings.LOSE_RESPONSES).format(score1, link1)
+            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
+            return self.get_random_list_value(settings.FAIL_RESPONSES).format(score1)
 
 # game = GameLogic()

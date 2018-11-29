@@ -44,7 +44,6 @@ To run the bot use:
 
 
 thank you internet
-* https://stackoverflow.com/questions/44203397/python-requests-get-returns-improperly-decoded-text-instead-of-utf-8
 * [introduction to scraping tables](https://qxf2.com/blog/web-scraping-using-python/)
 * [multiple tables in data](https://www.reddit.com/r/learnpython/comments/6tbrsz/pandas_dataframe_to_csv_attribute_error/)
 * [rename the headers](https://chrisalbon.com/python/data_wrangling/pandas_rename_column_headers/)
