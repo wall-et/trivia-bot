@@ -52,6 +52,7 @@ def respond(bot, update):
         bot.send_message(chat_id=chat_id, text=res[:res.index('url')], reply_markup=reply_markup)
 
     elif 'fail' in res:
+
         keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),InlineKeyboardButton("New infinite Game", callback_data='5'),InlineKeyboardButton("Page Summary", callback_data='4')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         send_gif(bot, res[res.index('url') + 3:], chat_id)
@@ -116,11 +117,19 @@ def button(bot, update):
         reply_markup = InlineKeyboardMarkup(keyboard)
         bot.send_message(chat_id=chat_id, text=f"have you heard of {page_title}", reply_markup=reply_markup)
 
-
+def help(bot, update):
+   chat_id = update.message.chat_id
+   keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),
+                InlineKeyboardButton("New infinite Game", callback_data='5')]]
+   reply_markup = InlineKeyboardMarkup(keyboard)
+   bot.send_message(chat_id=chat_id, text="I am the Wiki Trivi bot!\n i'll test you about your knowledge.....\n click to play",reply_markup=reply_markup)
 
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
+
+help_handler = CommandHandler('help', help)
+dispatcher.add_handler(help_handler)
 
 echo_handler = MessageHandler(Filters.text, respond)
 dispatcher.add_handler(echo_handler)

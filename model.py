@@ -186,9 +186,10 @@ class GameLogic:
         for w in split:
             if w in self.users_info_dict[id]["played_guesses"]:
                 return self.get_random_list_value(settings.REPEATING_GUESS)
-            for k in self.users_info_dict[id]['page_title'].lower():
-                if w == k:
-                    return self.get_random_list_value(settings.TITLE_REPONSES)
+
+        for k in self.users_info_dict[id]['page_title'].lower().split():
+            if word == k:
+                return self.get_random_list_value(settings.TITLE_REPONSES)
 
         if self.w_db.get_word(word):
             return self.get_random_list_value(settings.COMMON_RESPONSES)
