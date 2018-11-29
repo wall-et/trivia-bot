@@ -21,7 +21,7 @@ WIKI_EXLUDE_VALS = "list main"
 NUMBERS_RESPONSES = ["No way I'm accepting that.",
                      "Are you kidding? you can't guess numbers or letters....",
                      "Nope! i don't accept numbers and letters",
-                     "Didn'y I tell you? no numbers or letters"]
+                     "Didn't I tell you? no numbers or letters"]
 COMMON_RESPONSES = ["C'mon,This word is way too common...",
                     "Nah, Be more original with your words.",
                     "I want some good content, Buddy. Too common",

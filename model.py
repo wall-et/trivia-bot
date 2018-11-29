@@ -139,12 +139,20 @@ class GameLogic:
             return True
         return False
 
+    def test_premium(self, string1, liststr):
+
+        for link in liststr:
+            if re.search(r"\b" + re.escape(string1) + r"\b", link):
+                [self.users_info_dict[id]["played_guesses"].append(w) for w in link.split()]
+            print(f"found premium {prem}")
+            return True
+        return False
+
     def get_random_list_value(self, list):
         # return list[random.randrange(len(list))]
         return random.choice(list)
 
     def test_word(self, word, id):
-
         word = word.lower()
         if self.users_info_dict[id]['state'] == "getting value":
             if word == "yes":
@@ -187,9 +195,11 @@ class GameLogic:
 
         if self.string_found(word, self.users_info_dict[id]['page_content'].content.lower()):
 
+            # self.test_premium(word, self.users_info_dict[id]['page_content'].links)
+
             [self.users_info_dict[id]["played_guesses"].append(w) for w in split]
 
-            if word in self.users_info_dict[id]['page_content'].links:
+            if self.test_premium(word, self.users_info_dict[id]['page_content'].links):
                 self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS * 2
             else:
                 self.users_info_dict[id]["good_guesses"] += settings.POINTS_PER_GOOD_GUESS
@@ -200,7 +210,7 @@ class GameLogic:
                 score1 = self.user_db.get_score(id)
                 link1 = self.wg_db.get_random_gif()
                 return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1, link1)
-            # return f"Way to go! you'l finish in {settings.NUM_GOOD_GUESSES -self.users_info_dict[id]['good_guesses']} guesses"
+
             score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
             return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
 
