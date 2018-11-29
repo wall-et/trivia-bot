@@ -128,6 +128,7 @@ class GameLogic:
         self.users_info_dict[id]['wrong_guesses'] = 0
         self.users_info_dict[id]['score'] = 0
         self.users_info_dict[id]['played_guesses'] = []
+        self.users_info_dict[id]['infinite_round'] = False
 
     def get_full_page(self, id):
         value = wp.page(self.users_info_dict[id]['page_title'])
@@ -141,6 +142,9 @@ class GameLogic:
         if re.search(r"\b" + re.escape(string1) + r"\b", string2):
             return True
         return False
+
+    def toggle_infinte_game(self, id,val):
+        self.users_info_dict[id]['infinite_round'] = val
 
     # def test_premium(self, string1, liststr):
     #     for link in liststr:
@@ -201,15 +205,18 @@ class GameLogic:
 
             self.users_info_dict[id]["good_guesses"] += 1
 
-            if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
+            if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES and not self.users_info_dict[id]["infinite_round"]:
                 curr_score=self.users_info_dict[id]['score']
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
                 score1 = self.user_db.get_score(id)
                 link1 = self.wg_db.get_random_gif()
                 return self.get_random_list_value(settings.WIN_RESPONSES).format(curr_score,score1,link1)
 
-            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
-            return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
+            if not self.users_info_dict[id]['infinite_round']:
+                score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
+                return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
+            else:
+                return self.get_random_list_value(settings.INFINITE_SUCCESS)
 
         else:
             self.users_info_dict[id]["wrong_guesses"] += 1
@@ -221,4 +228,3 @@ class GameLogic:
                 return self.get_random_list_value(settings.LOSE_RESPONSES).format(score1, link1)
             score1 = settings.NUM_WRONG_GUESSES - self.users_info_dict[id]['wrong_guesses']
             return self.get_random_list_value(settings.FAIL_RESPONSES).format(score1)
-

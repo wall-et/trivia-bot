@@ -65,8 +65,12 @@ def button(bot, update):
     query = update.callback_query
     chat_id = query.message.chat_id
     if query.data == '1':
+        # ########################
+
         logger.info(f"= Got on chat #{chat_id}: pressed new game button")
         game.add_user(chat_id)
+        game.toggle_infinte_game(chat_id, False)
+
         page_title = game.get_page_title(chat_id)
         keyboard = [[InlineKeyboardButton("Yes", callback_data='2'), InlineKeyboardButton("No", callback_data='3')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -104,6 +108,13 @@ def button(bot, update):
         res=game.get_more_info(chat_id)
         bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
     elif query.data =='5':
+        # ########################
+        game.add_user(chat_id)
+        game.toggle_infinte_game(chat_id,True)
+        page_title = game.get_page_title(chat_id)
+        keyboard = [[InlineKeyboardButton("Yes", callback_data='2'), InlineKeyboardButton("No", callback_data='3')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        bot.send_message(chat_id=chat_id, text=f"have you heard of {page_title}", reply_markup=reply_markup)
 
 
 
