@@ -57,3 +57,4 @@ TITLE_REPONSES = ["hey, enter words about it...",
                   "I see what you did there...",
                   "No way I'm accepting that."]
 REPEATING_GUESS = ["Nice try. can't fool me. you used this word already","No recycling words here."]
+INFINITE_SUCCESS = ["Nice. Go On"]

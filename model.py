@@ -128,6 +128,7 @@ class GameLogic:
         self.users_info_dict[id]['wrong_guesses'] = 0
         self.users_info_dict[id]['score'] = 0
         self.users_info_dict[id]['played_guesses'] = []
+        self.users_info_dict[id]['infinite_round'] = False
 
     def get_full_page(self, id):
         value = wp.page(self.users_info_dict[id]['page_title'])
