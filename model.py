@@ -143,6 +143,12 @@ class GameLogic:
             return True
         return False
 
+    def toggle_infinte_game(self, id):
+        if self.users_info_dict[id]['infinite_round']:
+            self.users_info_dict[id]['infinite_round'] = False
+        else:
+            self.users_info_dict[id]['infinite_round'] = True
+
     # def test_premium(self, string1, liststr):
     #     for link in liststr:
     #         if re.search(r"\b" + re.escape(string1) + r"\b", link):
@@ -206,7 +212,7 @@ class GameLogic:
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
                 score1 = self.user_db.get_score(id)
                 link1 = self.wg_db.get_random_gif()
-                return self.get_random_list_value(settings.WIN_RESPONSES).format(score1,link1)
+                return self.get_random_list_value(settings.WIN_RESPONSES).format(score1, link1)
 
             score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
             return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
@@ -221,4 +227,3 @@ class GameLogic:
                 return self.get_random_list_value(settings.LOSE_RESPONSES).format(score1, link1)
             score1 = settings.NUM_WRONG_GUESSES - self.users_info_dict[id]['wrong_guesses']
             return self.get_random_list_value(settings.FAIL_RESPONSES).format(score1)
-
