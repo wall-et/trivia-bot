@@ -77,7 +77,9 @@ class fail_gifDB:
                                        upsert=True)
 
     def get_random_gif(self):
-        return self.lists.find().limit(-1).skip(random.randint(0, 12)).next()['url']
+        count = self.lists.estimated_document_count()
+        return self.lists.find()[random.randrange(count)]['url']
+        # return self.lists.find().limit(-1).skip(random.randint(0, 12)).next()['url']
 
 
 class win_gifDB:
@@ -144,13 +146,16 @@ class GameLogic:
         for link in liststr:
             if re.search(r"\b" + re.escape(string1) + r"\b", link):
                 [self.users_info_dict[id]["played_guesses"].append(w) for w in link.split()]
-            print(f"found premium {prem}")
+                print(f"found premium {link}")
             return True
         return False
 
     def get_random_list_value(self, list):
         # return list[random.randrange(len(list))]
         return random.choice(list)
+
+    def get_more_info(self,id):
+        return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + self.users_info_dict[id]['page_content'].url
 
     def test_word(self, word, id):
         word = word.lower()
@@ -165,17 +170,6 @@ class GameLogic:
                 page_title = self.users_info_dict[id]['page_title']
                 return self.get_random_list_value(settings.CHOOSE_VALUE).format(page_title)
                 # return f"So have you heard about {self.users_info_dict[id]['page_title']}?"
-            else:
-                return self.get_random_list_value(settings.INVALID_ANSWERS)
-
-        if self.users_info_dict[id]['state'] == "failed":
-            if word == "yes":
-                self.users_info_dict[id]['state'] = "getting value"
-                return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + \
-                       self.users_info_dict[id]['page_content'].url
-            elif word == "no":
-                self.users_info_dict[id]['state'] = "getting value"
-                return
             else:
                 return self.get_random_list_value(settings.INVALID_ANSWERS)
 
@@ -222,7 +216,8 @@ class GameLogic:
                 score1 = self.user_db.get_score(id)
                 link1 = self.g_db.get_random_gif()
                 return self.get_random_list_value(settings.LOSE_RESPONSES).format(score1, link1)
-            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
+            score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['wrong_guesses']
+            print(score1)
             return self.get_random_list_value(settings.FAIL_RESPONSES).format(score1)
 
 # game = GameLogic()

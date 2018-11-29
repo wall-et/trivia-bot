@@ -43,10 +43,10 @@ WIN_RESPONSES = ["You win!!!!!\nYour score is {}url{}", "and that's a win! with 
                  "clap your hands for this one! win with a score of {}url{}",
                  "aaaaand you win! {} points! url{}"]
 LOSE_RESPONSES = ["Nah, You failed this round.\n Your score is {}\nwould you like to hear about this subject?url{}",
-                  "Hahaha. You out. with a score of {}.\nwanna learn about it?url{}",
-                  "Sorry buddy, maybe next round.\nyou got {} points.url{}",
-                  "GameOver.\nscore:{}url{}",
-                  "So did you really know this one?\n{} points for you. url{}"]
+                  "Hahaha fail! You're out with a score of {}.\nwanna learn about it?url{}",
+                  "Sorry buddy you failed, maybe next round.\nyou got {} points.url{}",
+                  # "GameOver.\nscore:{}url{}",
+                  "So did you really know this one? I guess not, you failed! \n{} points for you. url{}"]
 CHOOSE_VALUE = ["So have you heard about {}?",
                 "really? what about {}?",
                 "This too? so head of {}?",
