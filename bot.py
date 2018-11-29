@@ -46,13 +46,13 @@ def respond(bot, update):
     res = game.test_word(text, chat_id)
 
     if 'win' in res:
-        keyboard = [[InlineKeyboardButton("New Game", callback_data='1'),InlineKeyboardButton("Page Summary", callback_data='4')]]
+        keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),InlineKeyboardButton("New infinite Game", callback_data='5'),InlineKeyboardButton("Page Summary", callback_data='4')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         send_gif(bot, res[res.index('url') + 3:], chat_id)
         bot.send_message(chat_id=chat_id, text=res[:res.index('url')], reply_markup=reply_markup)
 
     elif 'fail' in res:
-        keyboard = [[InlineKeyboardButton("New Game", callback_data='1'), InlineKeyboardButton("Page Summary", callback_data='4')]]
+        keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),InlineKeyboardButton("New infinite Game", callback_data='5'),InlineKeyboardButton("Page Summary", callback_data='4')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         send_gif(bot, res[res.index('url') + 3:], chat_id)
         bot.send_message(chat_id=chat_id, text=res[:res.index('url')], reply_markup=reply_markup)
@@ -87,7 +87,8 @@ def button(bot, update):
         logger.info(f"= Got on chat #{chat_id}: pressed no button")
         res = game.test_word("no", chat_id)
         if res == None:
-            keyboard = [[InlineKeyboardButton("New Game", callback_data='1')]]
+            keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),
+                         InlineKeyboardButton("New infinite Game", callback_data='5')]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             bot.send_message(chat_id=chat_id, text="play again?", reply_markup=reply_markup)
         else:
@@ -97,10 +98,13 @@ def button(bot, update):
 
     elif query.data == '4':
         print("btn4")
-        keyboard = [[InlineKeyboardButton("New Game", callback_data='1')]]
+        keyboard = [[InlineKeyboardButton("New normal Game", callback_data='1'),
+                         InlineKeyboardButton("New infinite Game", callback_data='5')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         res=game.get_more_info(chat_id)
         bot.send_message(chat_id=chat_id, text=res, reply_markup=reply_markup)
+    elif query.data =='5':
+
 
 
 

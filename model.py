@@ -157,6 +157,7 @@ class GameLogic:
         return wp.summary(self.users_info_dict[id]['page_title'], sentences=3) + '\n' + self.users_info_dict[id][
             'page_content'].url
 
+
     def test_word(self, word, id):
         word = word.lower()
         if self.users_info_dict[id]['state'] == "getting value":
@@ -201,11 +202,11 @@ class GameLogic:
             self.users_info_dict[id]["good_guesses"] += 1
 
             if self.users_info_dict[id]['good_guesses'] == settings.NUM_GOOD_GUESSES:
-                print("win")
+                curr_score=self.users_info_dict[id]['score']
                 self.user_db.update_score(id, self.users_info_dict[id]['score'])
                 score1 = self.user_db.get_score(id)
                 link1 = self.wg_db.get_random_gif()
-                return self.get_random_list_value(settings.WIN_RESPONSES).format(score1,link1)
+                return self.get_random_list_value(settings.WIN_RESPONSES).format(curr_score,score1,link1)
 
             score1 = settings.NUM_GOOD_GUESSES - self.users_info_dict[id]['good_guesses']
             return self.get_random_list_value(settings.SUCCESS_RESPONSES).format(score1)
