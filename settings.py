@@ -22,7 +22,7 @@ NUMBERS_RESPONSES = ["No way I'm accepting that.",
                      "Are you kidding? you can't guess numbers or letters....",
                      "Nope! i don't accept numbers and letters",
                      "Didn't I tell you? no numbers or letters"]
-COMMON_RESPONSES = ["C'mon,This word is way too common...",
+COMMON_RESPONSES = ["C'mon, This word is way too common...",
                     "Nah, Be more original with your words.",
                     "I want some good content, Buddy. Too common",
                     "Your guesses are so boring. Too common",
@@ -49,7 +49,7 @@ LOSE_RESPONSES = ["Nah, You failed this round.\n Your score is {}\nwould you lik
                   "So did you really know this one? I guess not, you failed! \n{} points for you. url{}"]
 CHOOSE_VALUE = ["So have you heard about {}?",
                 "really? what about {}?",
-                "This too? so head of {}?",
+                "This too? so heard of {}?",
                 "Just pick one. {}?", ]
 INVALID_ANSWERS = ["invalid answer.\nchoose 'yes' or 'no'."]
 TITLE_REPONSES = ["hey, enter words about it...",
