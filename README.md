@@ -1,8 +1,8 @@
 # WikiTrivi
 play an infinite trivia game testing your general knowledge <https://t.me/wiki_trivi_bot>
 
-* Chani Glick
-* Noami Pindrus
+* [Chani Glick](https://github.com/chanismile)
+* [Noami Pindrus](https://github.com/noamip)
 * Efrat Traube
 
 TriviBot will test your worldly knowledge using popular concepts from the last 5 years. 
